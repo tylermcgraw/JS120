@@ -186,7 +186,8 @@ class Game {
     this.human = new Human(Board.PIECES.human);
     this.computer = new Computer(Board.PIECES.computer);
     this.winLimit = 3;
-    this.player = this.human;
+    this.playerToMove = this.human;
+    this.firstMove = this.human;
   }
   displayWelcomeMessage() {
     console.clear();
@@ -242,6 +243,10 @@ class Game {
     } while (boardSize < 3 || boardSize > 9);
     return boardSize;
   }
+  getNextPlayerToMove(move) {
+    return move === this.human ? this.computer : this.human;
+  }
+  // eslint-disable-next-line max-statements, max-lines-per-function
   play() {
     this.displayWelcomeMessage();
     this.board = new Board(this.getBoardSize());
@@ -249,14 +254,17 @@ class Game {
     this.displayRules();
     while (true) {
       this.board.display();
-      this.board.update(this.player.getMove(this.board), this.player.symbol);
-      this.player = this.player === this.human ? this.computer : this.human;
+      this.board.update(
+        this.playerToMove.getMove(this.board), this.playerToMove.symbol);
+      this.playerToMove = this.getNextPlayerToMove(this.playerToMove);
       console.clear();
       if (this.gameOver()) {
         this.board.display();
         this.board.reset();
         this.matchOver();
         if (!this.playAgain()) break;
+        this.firstMove = this.getNextPlayerToMove(this.firstMove);
+        this.playerToMove = this.firstMove;
         console.clear();
       }
     }
